@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+
+
 <html>
 <head>
     <title>Itsuka Hiro</title>
+    <link rel="icon" type="image/x-icon" href="assets/music-game.png">
 </head>
 <body>
-    <h1>Welcome to my website!</h1>
+    <header>
+		<nav>
+			<ul>
+				<li><a href="https://youtube.com/@ItsukaHiro">Youtube Channel</a></li>
+				<li><a href="https://facebook.com/hiro.itsuka.00">Facebook Profile</a></li>
+				<li><a href="https://steamcommunity.com/id/itsukahiro/">Steam Profile</a></li>
+			</ul>
+		</nav>
+        <h1>
+            My name is Itsuka Hiro
+        </h1>
+	</header>
     <hr>
-
+    <article>
+        <p>
+            He
+        </p>
+    </article>
     <!-- HyperLink -->
     <a href="https://google.com" target=_blank>
         Google
@@ -21,10 +39,14 @@
     <hr>
 
     <!-- Audio -->
-    <audio controls autoplay loop>
+    <audio controls autoplay muted loop id="bgm">
         <source = src="assets/Fall_Into_The_Rabbit_Hole.mp3">
         This Browser doesn't support MTML5 audio.
     </audio>
+    <script>
+        var audio = document.getElementById("bgm");
+        audio.volume = 0.1;
+      </script>
     <hr>
 
     <!-- Video -->
