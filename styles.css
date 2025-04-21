@@ -1,55 +1,102 @@
-/* General styles for the body */
-body {
-    margin: 0;
-    font-family: 'MainDialoge', sans-serif; /* Use custom font */
-    background-color: #111;
-    color: white;
-    text-align: center;
-  }
-  
-  /* Define custom font */
-  @font-face {
-    font-family: 'MainDialoge';
-    src: url('/font/MainDialoge SDF.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+* {
+  box-sizing: border-box;
+}
 
-  * {
-    box-sizing: border-box; /* Include padding and border in element's total size */
-  }
-  
-  /* Styles for the preloader */
-  #preloader {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  
-  /* Styles for the loading image */
-  #preloader img {
-    width: 220px; /* Updated size */
-    height: auto;
-    margin-bottom: 1rem;
-    animation: bobbing 1s ease-in-out infinite;
-  }
-  
-  /* Keyframes for the bobbing animation */
-  @keyframes bobbing {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-  }
-  
-  /* Styles for the main content */
-  #main-content {
-    display: none;
-    padding: 2rem;
-    background-image: url('/assets/cg11_1.png'); /* Add background image */
-    background-size: cover; /* Ensure the image covers the entire area */
-    background-position: center; /* Center the background image */
-    background-repeat: no-repeat; /* Prevent the image from repeating */
-    color: white; /* Ensure text is visible on the background */
-    min-height: 100vh; /* Ensure the content area covers at least full screen height */
-  }
+body {
+  margin: 0;
+  font-family: 'MainDialoge', sans-serif;
+  background-color: #111;
+  color: white;
+  text-align: center;
+}
+
+@font-face {
+  font-family: 'MainDialoge';
+  src: url('/font/MainDialoge SDF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+#preloader {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+#preloader img {
+  width: 220px;
+  height: auto;
+  margin-bottom: 1rem;
+  animation: bobbing 1s ease-in-out infinite;
+}
+
+@keyframes bobbing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+#main-content {
+  display: none;
+  padding: 2rem;
+  background-image: url('/assets/cg11_1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  min-height: 100vh;
+}
+
+#dialog-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0.8) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  color: white;
+  z-index: 10;
+  display: none;
+  min-height: 200px;
+}
+
+#character-name {
+  font-size: 2.7rem;
+  font-weight: bold;
+  color: #ff4d4d;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  text-shadow: 
+    -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
+    1px 1px 0 white;
+}
+
+#dialog-container {
+  max-width: 70%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#dialog-text {
+  font-size: 2rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  color: white;
+  text-shadow: 
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}

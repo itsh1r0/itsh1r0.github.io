@@ -1,96 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VN Style Portfolio</title>
-
-  <!-- Preload assets -->
   <link rel="preload" href="/assets/cg11_1.png" as="image">
   <link rel="preload" href="/assets/cg11_4.png" as="image">
   <link rel="preload" href="/assets/cg11_5.png" as="image">
   <link rel="preload" href="/assets/cg11_6.png" as="image">
   <link rel="preload" href="/font/MainDialoge SDF.ttf" as="font" type="font/ttf" crossorigin>
-
-  <!-- Link to external CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body onload="initApp()">
   <div id="preloader">
-    <img id="loading-img" src="" alt="Loading..." />
+    <img id="loading-img" src="" alt="Loading...">
     <p>NOW LOADING...</p>
   </div>
-
   <div id="main-content">
     <h1>Welcome to my website</h1>
-    <p>Assets Preload Completed. 🥳</p>
   </div>
-
-  <script>
-    // List of loading images
-    const loadingImgs = [
-      "/assets/Load1.png",
-      "/assets/Load2.png",
-      "/assets/Load3.png"
-    ];
+  <div id="dialog-box">
+    <div id="character-name">Lilith</div>
+    <div id="dialog-container">
+      <div id="dialog-text">This is a sample dialog text.</div>
+    </div>
+  </div>
+  <script defer>
+    const loadingImgs = ["/assets/Load1.png", "/assets/Load2.png", "/assets/Load3.png"];
     const selectedLoadingImg = loadingImgs[Math.floor(Math.random() * loadingImgs.length)];
+    const dialogs = [
+      { character: "Lilith", text: "Welcome to my portfolio!" },
+      { character: "Lilith", text: "I'm a developer and designer." },
+      { character: "Lilith", text: "Feel free to explore my projects!" },
+      { character: "Lilith", text: "Thank you for visiting!" }
+    ];
+    let currentDialogIndex = 0;
 
-    /**
-     * Preload multiple assets (images and fonts)
-     * @param {string[]} urls - Array of asset URLs
-     * @returns {Promise} - Promise that resolves when all assets are loaded
-     */
-    function preloadAssets(urls) {
-      return Promise.all(
-        urls.map(src => {
-          if (src.endsWith('.ttf')) {
-            // If it's a font, use fetch to load
-            return fetch(src).then(response => {
-              if (!response.ok) throw new Error(`Failed to load font: ${src}`);
-            });
-          } else {
-            // If it's an image, create an Image object and load
-            return new Promise((resolve, reject) => {
-              const img = new Image();
-              img.src = src;
-              img.onload = () => resolve(img);
-              img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-            });
-          }
-        })
-      );
-    }
-
-    /**
-     * Initialize the application
-     */
     async function initApp() {
-      // Load the selected loading image
-      await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = selectedLoadingImg;
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Failed to load image: ${selectedLoadingImg}`));
-      });
+      const img = new Image();
+      img.src = selectedLoadingImg;
+      await new Promise(resolve => img.onload = resolve);
       document.getElementById("loading-img").src = selectedLoadingImg;
       document.getElementById("preloader").style.display = "flex";
 
-      // Preload assets and ensure a minimum loading time of 3 seconds
-      const preloadPromise = preloadAssets([
-        "/assets/cg11_1.png",
-        "/assets/cg11_4.png",
-        "/assets/cg11_5.png",
-        "/assets/cg11_6.png",
-        "/font/MainDialoge SDF.ttf" // Add font to preload list
+      const preloadPromise = Promise.all([
+        ...["/assets/cg11_1.png", "/assets/cg11_4.png", "/assets/cg11_5.png", "/assets/cg11_6.png"].map(src => {
+          return new Promise(resolve => {
+            const asset = new Image();
+            asset.src = src;
+            asset.onload = resolve;
+          });
+        }),
+        fetch("/font/MainDialoge SDF.ttf")
       ]);
-      const minimumTime = new Promise(resolve => setTimeout(resolve, 3000));
 
+      const minimumTime = new Promise(resolve => setTimeout(resolve, 3000));
       await Promise.all([preloadPromise, minimumTime]);
 
-      // Hide preloader and show main content
       document.getElementById("preloader").style.display = "none";
       document.getElementById("main-content").style.display = "block";
+      document.getElementById("dialog-box").style.display = "block";
+      updateDialog();
     }
+
+    function updateDialog() {
+      const currentDialog = dialogs[currentDialogIndex];
+      document.getElementById("character-name").textContent = currentDialog.character;
+      document.getElementById("dialog-text").textContent = currentDialog.text;
+    }
+
+    document.addEventListener("click", () => {
+      if (currentDialogIndex < dialogs.length - 1) {
+        currentDialogIndex++;
+        updateDialog();
+      }
+    });
   </script>
 </body>
 </html>
