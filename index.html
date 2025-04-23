@@ -86,10 +86,8 @@
     }
 
     document.addEventListener("click", () => {
-      if (!isPreloading && currentDialogIndex < dialogs.length - 1) {
-        currentDialogIndex++;
-        updateDialog();
-      }
+      if (!isPreloading && currentDialogIndex < dialogs.length - 1) 
+        currentDialogIndex++, updateDialog();
     });
   </script>
 </body>
