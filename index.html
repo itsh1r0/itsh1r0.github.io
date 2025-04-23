@@ -86,9 +86,7 @@
     }
 
     document.addEventListener("click", () => {
-      if (isPreloading) return; // Nếu đang trong quá trình loading, bỏ qua sự kiện click
-
-      if (currentDialogIndex < dialogs.length - 1) {
+      if (!isPreloading && currentDialogIndex < dialogs.length - 1) {
         currentDialogIndex++;
         updateDialog();
       }
