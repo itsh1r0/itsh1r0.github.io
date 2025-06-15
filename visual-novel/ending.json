@@ -1,0 +1,53 @@
+[
+  {
+    "fade": true,
+    "background": "./assets/cg_9.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "Yeah... I think I'll give you the link to Hiro's old portfolio.",
+    "background": "./assets/cg_9.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "You can check out some other links in this page.",
+    "background": "./assets/cg_9.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "They lead to his Steam Profile, Github Profile, and even his Youtube Channel.",
+    "background": "./assets/cg_9.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "Ah, this a cake for you.",
+    "background": "./assets/cg_a.png"
+  },
+  {
+    "text": "*snap*",
+    "background": "./assets/cg_c.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "I have somethings think to do that he just gave me recently.",
+    "background": "./assets/cg_b.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "So yeah.",
+    "background": "./assets/cg_b.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "Bye!",
+    "background": "./assets/cg_b.png"
+  },
+  {
+    "fade": true,
+    "background": "./assets/end.png"
+  },
+  {
+    "text": "The End.",
+    "background": "./assets/end.png"
+  }
+]
