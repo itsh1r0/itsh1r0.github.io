@@ -222,7 +222,10 @@
       volume = Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, vol));
       const percent = volume / VOLUME_MAX;
 
-      // Handle vị trí
+      // Quadratic mapping (mũ 2)
+      const logVolume = percent * percent;
+
+      // Handle vị trí (vẫn linear)
       const handleY = (1 - percent) * (sliderHeight - handleHeight);
       sliderHandle.style.top = `${handleY}px`;
 
@@ -234,9 +237,9 @@
       sliderFullImg.style.top = 'auto';
       sliderFullImg.style.transform = 'none';
 
-      // Volume audio
+      // Volume audio (quadratic)
       const bgm = document.getElementById('bgm');
-      if (bgm) bgm.volume = volume;
+      if (bgm) bgm.volume = logVolume;
     }
 
     // Khởi tạo vị trí ban đầu
