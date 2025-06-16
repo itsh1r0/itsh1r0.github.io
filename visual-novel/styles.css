@@ -1,26 +1,26 @@
-/* Apply box-sizing globally */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'MainDialoge', sans-serif;
-  color: white;
-  text-align: center;
-  background-color: #000; /* Nền đen mặc định */
-  min-height: 100vh; /* Đảm bảo background phủ toàn màn hình */
-  transition: background-image 0.2s ease-in-out;
-  cursor: url('./assets/cursor.png'), auto;
-}
+/* Global box-sizing and font */
+* { box-sizing: border-box; }
 
 @font-face {
   font-family: 'MainDialoge';
-  src: url('./font/MainDialoge\ SDF.ttf') format('truetype');
+  src: url('./font/MainDialoge SDF.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
+body {
+  margin: 0;
+  font-family: 'MainDialoge', Arial, sans-serif;
+  color: #fff;
+  background: #000;
+  min-height: 100vh;
+  text-align: center;
+  transition: background-image 0.35s;
+  cursor: url('./assets/cursor.png'), auto;
+  user-select: none;
+}
+
+/* Preloader */
 #preloader {
   display: none;
   flex-direction: column;
@@ -28,83 +28,82 @@ body {
   justify-content: center;
   height: 100vh;
 }
-
 #preloader img {
   width: 220px;
-  height: auto;
   margin-bottom: 1rem;
   animation: bobbing 1s ease-in-out infinite;
 }
-
 @keyframes bobbing {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  0%,100% { transform: translateY(0);}
+  50% { transform: translateY(-20px);}
 }
 
+/* Dialog Box */
 #dialog-box {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 20; /* Trên overlay */
-  width: 100%; /* Full width */
-  box-sizing: border-box;
-  display: flex; /* Sử dụng flexbox */
+  bottom: 0; left: 0; width: 100%;
+  z-index: 20;
+  display: flex;
   flex-direction: column;
-  align-items: center; /* Căn giữa nội dung theo chiều ngang */
-  justify-content: flex-start; /* Căn nội dung thoại và tên nhân vật lên trên */
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.8), /* Màu đen đậm */
-    rgba(0, 0, 0, 0.8) 50%, /* Giữ nguyên đến 50% chiều cao */
-    rgba(0, 0, 0, 0) 100% /* Chuyển dần về trong suốt */
-  );
-  color: white;
+  align-items: center;
+  background: linear-gradient(to top,rgba(0,0,0,0.8),rgba(0,0,0,0.8) 50%,rgba(0,0,0,0) 100%);
   display: none;
-  min-height: 200px; /* Tăng chiều cao dialog box */
+  min-height: 200px;
 }
 
+/* Character Name */
 #character-name {
-  font-size: 2.7rem; /* Font size lớn */
+  font-size: 2.7rem;
   font-weight: bold;
-  color: #ff4d4d; /* Màu đỏ cho tên nhân vật */
-  margin-bottom: 0.25rem; /* Khoảng cách với nội dung thoại */
-  text-align: center; /* Căn giữa tên nhân vật */
-  text-shadow: 
-    -1px -1px 0 white, /* Viền trên bên trái */
-    1px -1px 0 white,   /* Viền trên bên phải */
-    -1px 1px 0 white,   /* Viền dưới bên trái */
-    1px 1px 0 white;     /* Viền dưới bên phải */
+  color: #ff4d4d;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  text-shadow:
+    -1px -1px 0 #fff, 1px -1px 0 #fff,
+    -1px 1px 0 #fff, 1px 1px 0 #fff;
+  user-select: none;
 }
 
+/* Dialog Container & Text */
 #dialog-container {
-  max-width: 70%; /* Đặt宽度 là 70% màn hình */
-  margin: 0 auto; /* Căn giữa trên màn hình lớn */
-  text-align: center; /* Căn giữa thoại */
+  max-width: 70%;
+  margin: 0 auto;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-
 #dialog-text {
-  font-size: 2rem; /* Font size vừa phải */
+  font-size: 2rem;
   line-height: 1.5;
   margin-bottom: 1rem;
-  color: white; /* Màu chữ thoại */
-  text-shadow: 
-    -1px -1px 0 black, /* Viền trên bên trái */
-    1px -1px 0 black,   /* Viền trên bên phải */
-    -1px 1px 0 black,   /* Viền dưới bên trái */
-    1px 1px 0 black;    /* Viền dưới bên phải */
-}
-
-body, #dialog-box, #dialog-text, #character-name {
+  color: #fff;
+  text-shadow:
+    -1px -1px 0 #000, 1px -1px 0 #000,
+    -1px 1px 0 #000, 1px 1px 0 #000;
   user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
+}
+#dialog-text a {
+  color: inherit;
+  text-decoration: underline;
+  cursor: url('./assets/cursor.png'), pointer;
 }
 
-/* Style cho nút lựa chọn */
+/* Choices */
+#choices-container {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: none;
+}
+#choices-container .choice-btn {
+  pointer-events: auto;
+}
 .choice-btn {
   display: block;
   width: 1200px;
@@ -113,84 +112,40 @@ body, #dialog-box, #dialog-text, #character-name {
   padding: 24px 0;
   background: url('./assets/Choice_Frame_Normal.png') center/cover no-repeat;
   border: none;
-  outline: none;
   font-family: 'MainDialoge', Arial, sans-serif;
   font-size: 2.2rem;
   font-weight: bold;
   color: #fff;
   text-shadow: 2px 2px 8px #000, 0 0 4px #000;
-  cursor: url('./assets/cursor.png'), auto;
+  cursor: url('./assets/cursor.png'), pointer;
   transition: filter 0.2s, transform 0.1s;
   box-shadow: 0 4px 24px rgba(0,0,0,0.3);
   user-select: none;
-  /* Thêm mask để làm mờ hai bên */
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 25%,
-    black 75%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 25%,
-    black 75%,
-    transparent 100%
-  );
-  background-size: 100% 100%;      /* Background kéo full chiều ngang và dọc của nút */
-  background-repeat: no-repeat;    /* Không lặp lại */
-  background-position: center;     /* Căn giữa */
+  -webkit-mask-image: linear-gradient(to right,transparent 0%,black 25%,black 75%,transparent 100%);
+  mask-image: linear-gradient(to right,transparent 0%,black 25%,black 75%,transparent 100%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
-
 .choice-btn:hover, .choice-btn:focus {
   background-image: url('./assets/Choice_Frame_Select.png');
-  color: #ff4d4d; /* Màu giống character name */
-  text-shadow: 
-    -1px -1px 0 white,
-     1px -1px 0 white,
-    -1px  1px 0 white,
-     1px  1px 0 white;
+  color: #ff4d4d;
+  text-shadow:
+    -1px -1px 0 #fff, 1px -1px 0 #fff,
+    -1px 1px 0 #fff, 1px 1px 0 #fff;
   filter: brightness(1.2) drop-shadow(0 0 8px #fff);
   transform: scale(1.03);
 }
+.choice-btn:empty { display: none; }
 
-/* Đảm bảo container căn giữa */
-#dialog-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Ẩn nút khi không có lựa chọn */
-.choice-btn:empty {
-  display: none;
-}
-
-/* Container cho choices */
-#choices-container {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: none; /* Chỉ hiện khi có choices */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  pointer-events: none; /* Để các nút nhận sự kiện, sẽ override ở .choice-btn */
-}
-
-#choices-container .choice-btn {
-  pointer-events: auto; /* Cho phép click */
-}
-
+/* Fade Overlay */
 #fade-overlay {
   position: fixed;
   inset: 0;
   background: #000;
   opacity: 0;
   pointer-events: none;
-  z-index: 10; /* Dưới ô hội thoại */
+  z-index: 10;
   transition: opacity 1s;
 }
 #fade-overlay.active {
@@ -198,6 +153,7 @@ body, #dialog-box, #dialog-text, #character-name {
   pointer-events: all;
 }
 
+/* Volume Slider */
 #volume-slider {
   position: fixed;
   top: 50%;
@@ -206,31 +162,36 @@ body, #dialog-box, #dialog-text, #character-name {
   width: 32px;
   height: 400px;
   z-index: 50;
-  opacity: 0.7;         /* Thêm dòng này */
-  display: none;         /* Thêm dòng này để ẩn khi preload */
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.5s;
 }
-
-.slider-track,
-.slider-full-clip,
-.slider-full {
+#volume-slider.visible {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  pointer-events: auto;
+}
+#volume-slider.fading-out {
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: auto;
+}
+#volume-slider, #volume-slider * {
+  cursor: url('./assets/cursor.png'), pointer;
+}
+.slider-track, .slider-full-clip, .slider-full {
   position: absolute;
   left: 0;
   width: 32px;
   height: 400px;
 }
-
-.slider-track {
-  top: 0;
-  z-index: 1;
-}
-
+.slider-track { top: 0; z-index: 1; }
 .slider-full-clip {
   bottom: 0;
   overflow: hidden;
   z-index: 2;
-  height: 0; /* sẽ set bằng JS */
+  height: 0;
 }
-
 .slider-full {
   bottom: 0;
   left: 0;
@@ -239,20 +200,35 @@ body, #dialog-box, #dialog-text, #character-name {
   display: block;
   pointer-events: none;
 }
-
 .slider-handle {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 44px;   /* hoặc đúng kích thước ảnh handle */
-  height: 16px;  /* hoặc đúng kích thước ảnh handle */
+  width: 44px;
+  height: 16px;
   z-index: 3;
   cursor: pointer;
   user-select: none;
   pointer-events: auto;
 }
 
-#volume-slider,
-#volume-slider * {
-  cursor: url('./assets/cursor.png'), auto;
+/* BGM Hint */
+#bgm-hint {
+  position: fixed;
+  top: calc(50% + 210px);
+  right: 24px;
+  width: 160px;
+  text-align: center;
+  margin-top: 8px;
+  font-family: 'MainDialoge', Arial, sans-serif;
+  color: #fff;
+  font-size: 18px;
+  text-shadow: 1px 1px 2px #000;
+  cursor: pointer;
+  z-index: 51;
+  display: none;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.5);
+  border-radius: 8px;
+  padding: 4px 0;
 }

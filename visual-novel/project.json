@@ -26,12 +26,12 @@
   },
   {
     "character": "Lilith",
-    "text": "Like, this mod changing how sensitivity works in the game...",
+    "text": "Like, <a href='https://modrinth.com/mod/linear-sensitivity' target='_blank'>this mod</a> changing how sensitivity works in the game...",
     "background": "./assets/cg_3.png"
   },
   {
     "character": "Lilith",
-    "text": "Or, this mod rebalance one enchantment in the game.",
+    "text": "Or, <a href='https://modrinth.com/mod/durability-tweak' target='_blank'>this mod</a> rebalance one enchantment in the game.",
     "background": "./assets/cg_3.png"
   },
   {
@@ -41,7 +41,7 @@
   },
   {
     "character": "Lilith",
-    "text": "But it is his favorite project.",
+    "text": "But it is still his favorite project.",
     "background": "./assets/cg_4.png"
   },
   {
@@ -51,7 +51,7 @@
   },
   {
     "character": "Lilith",
-    "text": "Here's the link to Hiro's Github Profile, which contains all his coding projects.",
+    "text": "Here's the link to <a href='https://github.com/itsh1r0' target='_blank'>Hiro's Github Profile</a>, which contains all his coding projects.",
     "background": "./assets/cg_0.png"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "character": "Lilith",
-    "text": "He actually has a Youtube Channel.",
+    "text": "He actually has a <a href='https://www.youtube.com/@ItsukaHiro' target='_blank'>Youtube Channel</a>.",
     "background": "./assets/cg_3.png"
   },
   {
@@ -87,7 +87,8 @@
   {
     "background": "./assets/cg_2.png",
     "choices": [
-      { "text": "What's his future plan?", "next": "./goal.json" }
+      { "text": "What's his future plan?", "next": "./goal.json" },
+      { "text": "What about his education?", "next": "./education.json" }
     ]
   }
 ]

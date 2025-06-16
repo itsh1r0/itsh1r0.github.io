@@ -15,6 +15,7 @@
     "background": "./assets/cg_4.png"
   },
   {
+    "sound": "./assets/snap.mp3",
     "text": "*snap*",
     "fade": true,
     "background": "./assets/cg_8.png"
@@ -67,6 +68,11 @@
   {
     "character": "Lilith",
     "text": "Especially in this time...",
+    "background": "./assets/cg_6.png"
+  },
+  {
+    "character": "Lilith",
+    "text": "The gaming industry is so competitive right now, you know?",
     "background": "./assets/cg_6.png"
   },
   {

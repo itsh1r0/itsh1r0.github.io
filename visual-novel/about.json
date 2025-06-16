@@ -26,23 +26,24 @@
   },
   {
     "character": "Lilith",
-    "text": "And some realistic First-Person Shooter games, i dont know why.",
+    "text": "And some realistic First-Person Shooter games, I don't know why.",
     "background": "./assets/cg_1.png"
   },
   {
     "character": "Lilith",
-    "text": "Maybe because his passion for guns?",
+    "text": "Maybe because his passion for firearms?",
     "background": "./assets/cg_0.png"
   },
   {
     "character": "Lilith",
-    "text": "Well, don't ask me why I just call him Hiro. He just don't want me reveal his real name.",
+    "text": "Well, atleast don't ask me why I call him Hiro. He just don't want me reveal his real name.",
     "background": "./assets/cg_4.png"
   },
   {
     "background": "./assets/cg_4.png",
     "choices": [
-      { "text": "His skill?", "next": "./skill.json" }
+      { "text": "His skills?", "next": "./skill.json" },
+      { "text": "What about his education?", "next": "./education.json" }
     ]
   }
 ]

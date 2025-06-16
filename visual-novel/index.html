@@ -26,13 +26,19 @@
   <div id="preloader">
     <img id="loading-img" src="" alt="Loading...">
     <p>NOW LOADING...</p>
+    <div id="controls-guide" style="margin-top:24px; font-size:1.2rem; color:#fff; font-family:'MainDialoge', Arial, sans-serif; text-shadow:1px 1px 2px #000;">
+      <div><b>Mouse</b> / <b>Space</b>: Continue</div>
+      <div><b>F</b>: Fast Forward</div>
+      <div><b>Mouse Scroll</b>: Music Volume</div>
+      <div><b>M</b>: Mute/Unmute</div>
+    </div>
   </div>
   <div id="dialog-box">
-    <div id="character-name">Lilith</div>
+    <div id="character-name"></div>
     <div id="dialog-container">
-      <div id="dialog-text">This is a sample dialog text.</div>
+      <div id="dialog-text"></div>
     </div>
-    <div id="choices-container"></div> <!-- Thêm dòng này -->
+    <div id="choices-container"></div>
   </div>
   <div id="volume-slider">
     <img src="./assets/slider.png" class="slider-track" draggable="false">
@@ -41,84 +47,88 @@
     </div>
     <img src="./assets/slider_handle.png" class="slider-handle" id="slider-handle" draggable="false">
   </div>
+  <div id="bgm-hint">Turn on BGM</div>
   <audio id="bgm" src="./assets/Waterdrop.mp3" loop></audio>
   <script defer>
+    let sliderHideTimeout = null, lastDialogSwitch = 0, fastForward = false, fastForwardInterval = null;
     const loadingImgs = ["./assets/Load1.png", "./assets/Load2.png", "./assets/Load3.png"];
     const selectedLoadingImg = loadingImgs[Math.floor(Math.random() * loadingImgs.length)];
-    let dialogs = [];
-    let currentDialogIndex = 0;
-    let isPreloading = true;
-    let isFading = false;
+    const slider = document.getElementById('volume-slider');
+    const sliderHandle = document.getElementById('slider-handle');
+    const sliderFullClip = document.querySelector('.slider-full-clip');
+    const sliderFullImg = sliderFullClip.querySelector('.slider-full');
+    const sliderHeight = 400, handleHeight = 16, VOLUME_MIN = 0, VOLUME_MAX = 1.0, DEFAULT_VOLUME = 0.7;
+    let dialogs = [], currentDialogIndex = 0, isPreloading = true, isFading = false;
+    let volume = 0.7, lastNonZeroVolume = 0.7, dragging = false, skipNextClick = false, lastSliderClick = 0;
+    const readFiles = new Set();
+
+    function showSlider() {
+      if (isPreloading) return;
+      if (!slider.classList.contains("visible")) {
+        slider.classList.add("visible");
+        slider.classList.remove("fading-out");
+      }
+      if (sliderHideTimeout) clearTimeout(sliderHideTimeout);
+      sliderHideTimeout = setTimeout(hideSlider, 1000);
+    }
+
+    function hideSlider() {
+      slider.classList.remove("visible");
+      slider.classList.add("fading-out");
+      if (sliderHideTimeout) {
+        clearTimeout(sliderHideTimeout);
+        sliderHideTimeout = null;
+      }
+    }
 
     async function loadDialogs(file = "prologue.json") {
       const res = await fetch(file);
       dialogs = await res.json();
       currentDialogIndex = 0;
       updateDialog();
+      readFiles.add(file);
     }
 
     async function initApp() {
-      // Hiển thị preloader với nền đen
       document.body.style.backgroundColor = "#000";
       document.getElementById("preloader").style.display = "flex";
-
-      // Load hình ảnh loading
       const img = new Image();
       img.src = selectedLoadingImg;
       await new Promise(resolve => img.onload = resolve);
       document.getElementById("loading-img").src = selectedLoadingImg;
-
-      // Preload tất cả tài nguyên
       const preloadPromise = Promise.all([
-        ...["./assets/cg_0.png",
-            "./assets/cg_1.png",
-            "./assets/cg_2.png",
-            "./assets/cg_3.png",
-            "./assets/cg_4.png",
-            "./assets/cg_5.png",
-            "./assets/cg_6.png",
-            "./assets/cg_7.png",
-            "./assets/cg_8.png",
-            "./assets/cg_9.png",
-            "./assets/cg_a.png",
-            "./assets/cg_b.png",
-            "./assets/cg_c.png"].map(src => {
-          return new Promise(resolve => {
-            const asset = new Image();
-            asset.src = src;
-            asset.onload = resolve;
-          });
-        }),
+        ...[
+          "./assets/cg_0.png","./assets/cg_1.png","./assets/cg_2.png","./assets/cg_3.png",
+          "./assets/cg_4.png","./assets/cg_5.png","./assets/cg_6.png","./assets/cg_7.png",
+          "./assets/cg_8.png","./assets/cg_9.png","./assets/cg_a.png","./assets/cg_b.png","./assets/cg_c.png"
+        ].map(src => new Promise(resolve => { const asset = new Image(); asset.src = src; asset.onload = resolve; })),
         fetch("./font/MainDialoge SDF.ttf")
       ]);
-
-      const minimumTime = new Promise(resolve => setTimeout(resolve, 3000));
-      await Promise.all([preloadPromise, minimumTime]);
-
-      // Load dialogs trước khi truy cập dialogs[0]
+      await Promise.all([preloadPromise, new Promise(r => setTimeout(r, 5000))]);
       await loadDialogs();
-
-      // Chuyển sang background đầu tiên sau khi preload hoàn thành
       document.body.style.backgroundImage = `url('${dialogs[0].background}')`;
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center";
       document.body.style.backgroundRepeat = "no-repeat";
-
-      // Ẩn preloader và hiển thị dialog box
       document.getElementById("preloader").style.display = "none";
       document.getElementById("dialog-box").style.display = "block";
-      document.getElementById("volume-slider").style.display = "block"; // Thêm dòng này
       isPreloading = false;
+      setVolumeSlider(volume);
 
-      // Phát nhạc nền sau khi preload xong
       const bgm = document.getElementById("bgm");
-      if (bgm) {
-        try {
-          await bgm.play();
-        } catch (e) {
-          // Một số trình duyệt yêu cầu tương tác người dùng mới phát nhạc
-          // Có thể xử lý ở đây nếu muốn
-        }
+      const hint = document.getElementById('bgm-hint');
+      hint.style.display = "none";
+      try {
+        await bgm.play();
+      } catch (e) {
+        hint.style.display = "block";
+        hint.onclick = async function(event) {
+          event.stopPropagation();
+          try {
+            await bgm.play();
+            hint.style.display = "none";
+          } catch (e) {}
+        };
       }
     }
 
@@ -138,35 +148,31 @@
       const currentDialog = dialogs[currentDialogIndex];
       const choicesContainer = document.getElementById("choices-container");
 
+      if (currentDialog.sound) {
+        const sfx = new Audio(currentDialog.sound);
+        sfx.volume = 1.0;
+        sfx.play().catch(() => {});
+      }
+
       if (currentDialog.fade) {
-        // Đổi background và text TRƯỚC khi fade
         document.body.style.backgroundImage = `url('${currentDialog.background}')`;
-        document.getElementById("character-name").textContent = currentDialog.character;
-        document.getElementById("dialog-text").textContent = currentDialog.text;
-
-        // Hiện overlay đen hoàn toàn (không transition)
+        updateCharacterName(currentDialog);
+        updateDialogText(currentDialog);
         setFade(true, true);
-        await new Promise(r => setTimeout(r, 1000)); // 1s đen ngòm
-
-        // Dần hiện ra trong 1s
-        setFade(false, false); // transition 1s
+        await new Promise(r => setTimeout(r, 1000));
+        setFade(false, false);
         isFading = true;
         await new Promise(r => setTimeout(r, 1000));
         isFading = false;
-
-        // Sau khi fade xong, tự động sang hội thoại tiếp theo
         currentDialogIndex++;
-        if (currentDialogIndex < dialogs.length) {
-          updateDialog();
-        }
+        if (currentDialogIndex < dialogs.length) updateDialog();
         return;
       } else {
         document.body.style.backgroundImage = `url('${currentDialog.background}')`;
-        document.getElementById("character-name").textContent = currentDialog.character;
-        document.getElementById("dialog-text").textContent = currentDialog.text;
+        updateCharacterName(currentDialog);
+        updateDialogText(currentDialog);
       }
 
-      // Nếu có trường next và không có choices, tự động chuyển file
       if (currentDialog.next && !currentDialog.choices) {
         loadDialogs(currentDialog.next);
         return;
@@ -175,7 +181,15 @@
       choicesContainer.innerHTML = "";
       if (currentDialog.choices) {
         choicesContainer.style.display = "flex";
-        currentDialog.choices.forEach(choice => {
+        const filteredChoices = currentDialog.choices.filter(choice => {
+          if (choice.next && readFiles.has(choice.next)) return false;
+          if (
+            choice.next === "./goal.json" &&
+            (!readFiles.has("./education.json") || !readFiles.has("./skill.json"))
+          ) return false;
+          return true;
+        });
+        filteredChoices.forEach(choice => {
           const btn = document.createElement("button");
           btn.textContent = choice.text;
           btn.className = "choice-btn";
@@ -185,83 +199,171 @@
           };
           choicesContainer.appendChild(btn);
         });
+        if (filteredChoices.length === 0) {
+          choicesContainer.innerHTML = "<i>All paths have been read.</i>";
+        }
       } else {
         choicesContainer.style.display = "none";
       }
     }
 
-    // Ngăn click khi đang fade
+    function updateCharacterName(currentDialog) {
+      const nameBox = document.getElementById("character-name");
+      if (
+        typeof currentDialog.character === "string" &&
+        currentDialog.character.trim() !== ""
+      ) {
+        nameBox.textContent = currentDialog.character;
+        nameBox.style.display = "block";
+      } else {
+        nameBox.textContent = "";
+        nameBox.style.display = "none";
+      }
+    }
+
+    function updateDialogText(currentDialog) {
+      document.getElementById("dialog-text").innerHTML =
+        typeof currentDialog.text === "string" ? currentDialog.text : "";
+    }
+
+    function canSwitchDialog() {
+      const now = Date.now();
+      const limit = fastForward ? 50 : 350;
+      if (now - lastDialogSwitch < limit) return false;
+      lastDialogSwitch = now;
+      return true;
+    }
+
     document.addEventListener("mousedown", function(e) {
-      // Không chuyển hội thoại nếu đang fade, preload, hoặc click vào slider
       if (
         isFading ||
         isPreloading ||
         dialogs.length === 0 ||
         dialogs[currentDialogIndex].choices ||
         currentDialogIndex >= dialogs.length - 1 ||
-        e.target.closest('#volume-slider')
+        e.target.closest('#volume-slider') ||
+        e.target.closest('#bgm-hint') ||
+        e.target.closest('a')
       ) {
         return;
       }
+      if (!canSwitchDialog()) return;
       currentDialogIndex++;
       updateDialog();
     });
 
-    const slider = document.getElementById('volume-slider');
-    const sliderHeight = 400; // px
-    const handleHeight = 16;  // px (đúng kích thước ảnh handle)
-    const VOLUME_MIN = 0;
-    const VOLUME_MAX = 1.0;
-    let volume = 0.7;
+    document.getElementById('dialog-text').addEventListener('mousedown', function(e) {
+      if (e.target.closest('a')) e.stopPropagation();
+    });
 
-    const sliderHandle = document.getElementById('slider-handle');
-    const sliderFullClip = document.querySelector('.slider-full-clip');
-    const sliderFullImg = sliderFullClip.querySelector('.slider-full');
+    document.addEventListener("keydown", function(e) {
+      if (
+        e.code === "Space" &&
+        !isFading &&
+        !isPreloading &&
+        dialogs.length > 0 &&
+        !dialogs[currentDialogIndex].choices &&
+        currentDialogIndex < dialogs.length - 1 &&
+        !document.activeElement.isContentEditable &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        if (!canSwitchDialog()) return;
+        currentDialogIndex++;
+        updateDialog();
+      }
+    });
+
+    document.addEventListener("keydown", async function(e) {
+      if (e.code === "KeyM") {
+        const hint = document.getElementById('bgm-hint');
+        const bgm = document.getElementById('bgm');
+        if (hint && hint.style.display === "block") {
+          try {
+            await bgm.play();
+            hint.style.display = "none";
+          } catch (err) {}
+        } else {
+          if (volume > 0) {
+            setVolumeSlider(0);
+          } else {
+            setVolumeSlider(lastNonZeroVolume > 0 ? lastNonZeroVolume : 0.7);
+          }
+        }
+      }
+    });
+
+    document.addEventListener("keydown", function(e) {
+      if (e.code === "KeyF" && !fastForward) {
+        fastForward = true;
+        if (
+          !isFading &&
+          !isPreloading &&
+          dialogs.length > 0 &&
+          !dialogs[currentDialogIndex].choices &&
+          currentDialogIndex < dialogs.length - 1
+        ) {
+          fastForwardInterval = setInterval(() => {
+            if (
+              isFading ||
+              isPreloading ||
+              dialogs.length === 0 ||
+              dialogs[currentDialogIndex].choices ||
+              currentDialogIndex >= dialogs.length - 1
+            ) {
+              clearInterval(fastForwardInterval);
+              fastForwardInterval = null;
+              return;
+            }
+            currentDialogIndex++;
+            updateDialog();
+          }, 50);
+        }
+      }
+    });
+    document.addEventListener("keyup", function(e) {
+      if (e.code === "KeyF") {
+        fastForward = false;
+        if (fastForwardInterval) {
+          clearInterval(fastForwardInterval);
+          fastForwardInterval = null;
+        }
+      }
+    });
 
     function setVolumeSlider(vol) {
+      if (isPreloading) return;
+      showSlider();
       volume = Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, vol));
+      if (volume > 0) lastNonZeroVolume = volume;
       const percent = volume / VOLUME_MAX;
-
-      // Quadratic mapping (mũ 2)
-      const logVolume = percent * percent;
-
-      // Handle vị trí (vẫn linear)
+      const logVolume = Math.pow(percent, 1.5);
       const handleY = (1 - percent) * (sliderHeight - handleHeight);
       sliderHandle.style.top = `${handleY}px`;
-
-      // Phần đầy: crop phần trên, giữ phần dưới
       const visibleHeight = percent * sliderHeight;
       sliderFullClip.style.height = `${visibleHeight}px`;
       sliderFullClip.style.bottom = '0';
       sliderFullImg.style.bottom = '0';
       sliderFullImg.style.top = 'auto';
       sliderFullImg.style.transform = 'none';
-
-      // Volume audio (quadratic)
       const bgm = document.getElementById('bgm');
       if (bgm) bgm.volume = logVolume;
     }
 
-    // Khởi tạo vị trí ban đầu
-    setVolumeSlider(volume);
-
-    // Kéo handle
-    let dragging = false;
-    let skipNextClick = false;
-
     sliderHandle.addEventListener('mousedown', function(e) {
+      if (isPreloading) return;
+      showSlider();
       dragging = true;
       document.body.style.userSelect = 'none';
-      // Ngăn trình duyệt tạo click sau mouseup
       e.preventDefault();
     });
 
     document.addEventListener('mouseup', function(e) {
       if (dragging) {
         dragging = false;
-        skipNextClick = true; // Đánh dấu phải bỏ qua click tiếp theo
+        skipNextClick = true;
         document.body.style.userSelect = '';
-        // Ngăn trình duyệt tạo click sau mouseup
         e.preventDefault && e.preventDefault();
       }
     });
@@ -273,7 +375,6 @@
         e.preventDefault && e.preventDefault();
         return;
       }
-      // ...xử lý chuyển hội thoại như cũ...
     });
 
     document.addEventListener('mousemove', function(e) {
@@ -285,14 +386,11 @@
       setVolumeSlider(percent * VOLUME_MAX);
     });
 
-    let lastSliderClick = 0;
-    const DEFAULT_VOLUME = 0.7;
-
-    // Click vào slider để chỉnh nhanh
     slider.addEventListener('click', function(e) {
+      if (isPreloading) return;
       e.stopPropagation();
       const now = Date.now();
-      if (now - lastSliderClick < 150) { // 0.15s
+      if (now - lastSliderClick < 200) {
         setVolumeSlider(DEFAULT_VOLUME);
       } else {
         const rect = slider.getBoundingClientRect();
@@ -304,8 +402,32 @@
       lastSliderClick = now;
     });
 
-    // Khởi tạo vị trí ban đầu (70%)
-    setVolumeSlider(0.7);
+    slider.addEventListener('mouseenter', function() {
+      if (isPreloading) return;
+      showSlider();
+    });
+    slider.addEventListener('mousemove', function() {
+      if (isPreloading) return;
+      showSlider();
+    });
+    slider.addEventListener('mouseleave', function() {
+      if (isPreloading) return;
+      if (sliderHideTimeout) clearTimeout(sliderHideTimeout);
+      sliderHideTimeout = setTimeout(hideSlider, 1000);
+    });
+
+    window.addEventListener('wheel', function(e) {
+      if (
+        isPreloading ||
+        document.activeElement.isContentEditable ||
+        document.activeElement.tagName === "INPUT" ||
+        document.activeElement.tagName === "TEXTAREA"
+      ) return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.02 : 0.02;
+      showSlider();
+      setVolumeSlider(volume + delta);
+    }, { passive: false });
   </script>
 </body>
 </html>
